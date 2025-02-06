@@ -12,27 +12,25 @@ params.krakenuniq_bracken_dir = "${projectDir}/RESULTS/BRACKEN"
 params.metaphlan4_dir = "${projectDir}/RESULTS/METAPHLAN4"
 params.consensus_taxa_dir = "${projectDir}/RESULTS/CONSENSUS_TAXA"
 
-// Databases and ref files
+// Databases and ref files [CHANGE THIS]
 params.hg38_db="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/dbs/human-GRC-db.mmi"
 params.t2t_phix_db="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/dbs/human-GCA-phix-db.mmi"
 params.pangenome_db="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/dbs/pangenome_mmi"
 params.kraken_db="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/dbs/krakenUniq_8_8_2023"
 params.metaphlan_db="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/dbs/metaphlan"
-params.adapters="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/ref/known_adapters.fna"
+params.adapters="./ref/known_adapters.fna"
 
 // Enviroment paths
-params.samtools_env = "/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/yml/samtools_env.yml"
-params.fastp_env = "/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/yml/fastp_env.yml"
-params.minimap2_env = "/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/yml/minimap2_env.yml"
-params.multiqc_env = "/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/yml/multiqc_env.yml"
-params.krakenuniq_bracken_env = "/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/yml/krakenUniq_bracken_env.yml"
-params.downstream_CMP_env = "/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/yml/downstream_CMP_env.yml"
-params.metaphlan4_env = "/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/yml/metaphlan4_env.yml"
+params.samtools_env = "./conda_envs/samtools_env.yml"
+params.fastp_env = "./conda_envs/fastp_env.yml"
+params.minimap2_env = "./conda_envs/minimap2_env.yml"
+params.multiqc_env = "./conda_envs/multiqc_env.yml"
+params.krakenuniq_bracken_env = "./conda_envs/krakenUniq_bracken_env.yml"
+params.downstream_CMP_env = "./conda_envs/downstream_CMP_env.yml"
+params.metaphlan4_env = "./conda_envs/metaphlan4_env.yml"
 
 // Package and script paths
-params.krakentools_pack ="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/packages/KrakenTools"
-params.metaphlan4_pack ="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/packages/MetaPhlAn-4.1.1"
-params.python_scripts ="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/packages"
+params.scripts ="./scripts"
 
 
 // Include Processes
@@ -56,16 +54,16 @@ workflow {
         }
 
     // Extract reads from BAM files
-    //extractReads(sample_sheet).set { UNMAPPED_READS }
+    extractReads(sample_sheet).set { UNMAPPED_READS }
 
     // Perform FastQC on the extracted fastq files
-    //FASTQC1(UNMAPPED_READS.r1_fastq, UNMAPPED_READS.r2_fastq)
+    FASTQC1(UNMAPPED_READS.r1_fastq, UNMAPPED_READS.r2_fastq)
 
     // Filter poor quality reads using fastp
-    //filterReads(UNMAPPED_READS.r1_fastq, UNMAPPED_READS.r2_fastq).set { FILTERED_UNMAPPED_READS }
+    filterReads(UNMAPPED_READS.r1_fastq, UNMAPPED_READS.r2_fastq).set { FILTERED_UNMAPPED_READS }
 
     // Perform FastQC on the filtered fastq files
-    //FASTQC2(FILTERED_UNMAPPED_READS.r1_fastq, FILTERED_UNMAPPED_READS.r2_fastq)
+    FASTQC2(FILTERED_UNMAPPED_READS.r1_fastq, FILTERED_UNMAPPED_READS.r2_fastq)
 
     // gather the list of pangenome .mmi files
     def mmiFiles = []
@@ -76,54 +74,30 @@ workflow {
         }
     }
 
-
-    //Channel.fromPath("RESULTS/UNMAPPED_BAM/PD56137a.R1.UNMAPPED.FASTP.FILTERED.fastq.gz")
-    //.set { r1_fastq_channel }
-    //mapReadsR1(r1_fastq_channel, mmiFiles, 'R1').set { R1_MAPPED }
-
     // R1 Processing
-    //mapReadsR1(FILTERED_UNMAPPED_READS.r1_fastq, mmiFiles, 'R1').set { R1_MAPPED }
+    mapReadsR1(FILTERED_UNMAPPED_READS.r1_fastq, mmiFiles, 'R1').set { R1_MAPPED }
 
     // R2 Processing
-    //mapReadsR2(FILTERED_UNMAPPED_READS.r2_fastq,  mmiFiles, 'R2').set { R2_MAPPED }
+    mapReadsR2(FILTERED_UNMAPPED_READS.r2_fastq,  mmiFiles, 'R2').set { R2_MAPPED }
 
     // Perform FastQC on the filtered fastq files
-    //FASTQCHG38(R1_MAPPED.hg38_fastq, R2_MAPPED.hg38_fastq)
+    FASTQCHG38(R1_MAPPED.hg38_fastq, R2_MAPPED.hg38_fastq)
 
     // Perform FastQC on the filtered fastq files
-    //FASTQCT2T(R1_MAPPED.t2t_fastq, R2_MAPPED.t2t_fastq)
+    FASTQCT2T(R1_MAPPED.t2t_fastq, R2_MAPPED.t2t_fastq)
 
     // Perform FastQC on the filtered fastq files
-    //FASTQCPANGENOME(R1_MAPPED.pangenome_fastq, R2_MAPPED.pangenome_fastq)
+    FASTQCPANGENOME(R1_MAPPED.pangenome_fastq, R2_MAPPED.pangenome_fastq)
 
     // Metaphlan Taxonomic Classification
-    // metaphlan4(R1_MAPPED.pangenome_fastq, R2_MAPPED.pangenome_fastq)
-    //Channel.fromPath("RESULTS/MAPPED_READS/PD56137a.R1.UNMAPPED.FASTP.FILTERED.hg38.t2t.pangenome.fastq.gz")
-    //.set { r1_fastq_channel }
-
-    //Channel.fromPath("RESULTS/MAPPED_READS/PD56137a.R2.UNMAPPED.FASTP.FILTERED.hg38.t2t.pangenome.fastq.gz")
-    //.set { r2_fastq_channel }
-
-    //metaphlan4(r1_fastq_channel, r2_fastq_channel)
+    metaphlan4(R1_MAPPED.pangenome_fastq, R2_MAPPED.pangenome_fastq)
 
     // Kracken Taxonomic Classification
-    //Bracken(R1_MAPPED.pangenome_fastq, R2_MAPPED.pangenome_fastq)
-    //Bracken(r1_fastq_channel, r2_fastq_channel)
+    Bracken(R1_MAPPED.pangenome_fastq, R2_MAPPED.pangenome_fastq)
 
-    Channel.fromPath("RESULTS/BRACKEN/PD56137a.bracken.*.mpa.report.txt")
-    .set { r1_fastq_channel }
-
-
-    //metaphlan4(r1_fastq_channel, r2_fastq_channel)
-
-    // CONSENSUS TAXA ANNOTATIONS
-    //process_metaphlan(metaphlan4.out.metagenome_file.collect()) 
-    //process_bracken(Bracken.out.krakenreport.collect()) 
-    process_bracken(r1_fastq_channel) 
-
-    consensus_taxa(process_metaphlan.out.metaphlan_file,process_bracken.out.bracken_genus_file, process_bracken.out.bracken_species_file )
-
-
+    // PROCESS TAXA ANNOTATIONS
+    process_metaphlan(metaphlan4.out.metagenome_file.collect()) 
+    process_bracken(Bracken.out.krakenreport.collect()) 
 
 }
 

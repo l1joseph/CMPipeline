@@ -21,7 +21,7 @@ process process_metaphlan {
     # Define the directory where profiled files are located
 
     # Run the MetaPhlAn script to merge tables
-    python3 "${params.metaphlan4_pack}/metaphlan/utils/merge_metaphlan_tables.py" *.profiled_metagenome.txt > merged_abundance_table.txt
+    python3 "${params.scripts}/merge_metaphlan_tables.py" *.profiled_metagenome.txt > merged_abundance_table.txt
 
     # Genus level
     grep -E "g__|PD" merged_abundance_table.txt \\
@@ -65,7 +65,7 @@ process process_bracken {
     """
     # Combine genus-level files
     if [ -n "$GENUS_FILES" ]; then
-        python ${params.krakentools_pack}/combine_mpa.py --input $GENUS_FILES \\
+        python ${params.scripts}/combine_mpa.py --input $GENUS_FILES \\
                                                          --output bracken.genus.mpa.report.txt
     else
         echo "No genus files found." > bracken.genus.mpa.report.txt
@@ -73,7 +73,7 @@ process process_bracken {
 
     # Combine species-level files
     if [ -n "$SPECIES_FILES" ]; then
-        python ${params.krakentools_pack}/combine_mpa.py --input $SPECIES_FILES \\
+        python ${params.scripts}/combine_mpa.py --input $SPECIES_FILES \\
                                                          --output bracken.species.mpa.report.txt
     else
         echo "No species files found." > bracken.species.mpa.report.txt
@@ -100,7 +100,7 @@ process consensus_taxa {
 
     script:
     """
-    python "${params.python_scripts}"/compute_consensus_taxa.py --metaphlan ${metaphlan_file} \\
+    python "${params.scripts}"/compute_consensus_taxa.py --metaphlan ${metaphlan_file} \\
                                      --bracken_genus ${bracken_genus_file} \\
                                      --bracken_species ${bracken_species_file} \\
                                      --output bracken.metaphlan.taxa.prop.tumor.pdf \\

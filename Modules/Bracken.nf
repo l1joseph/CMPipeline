@@ -41,7 +41,7 @@ process Bracken {
         bracken_kraken_report="${SAMPLE_NAME}.bracken.\${lvl}.krakenreport.txt"
         bracken_kraken_mpa_report="${SAMPLE_NAME}.bracken.\${lvl}.mpa.report.txt"
         bracken -d "${params.kraken_db}" -i \${REPORT} -o \${bracken_output} -w \${bracken_kraken_report} -r 50 -l \${lvl} -t 2
-        python ${params.krakentools_pack}/kreport2mpa.py -r \${bracken_kraken_report} -o \${bracken_kraken_mpa_report} --display-header
+        python ${params.scripts}/kreport2mpa.py -r \${bracken_kraken_report} -o \${bracken_kraken_mpa_report} --display-header
     done
 
     echo "Done processing ${SAMPLE_NAME}"
