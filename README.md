@@ -12,6 +12,17 @@
   - sample.csv
 
   > You can find these shared files and folder in `/tscc/nfs/home/amabbasi/restricted/microbiome_pipeline/CMPipeline`
+
+3. Next, download the human reference genomes to be used for filtration. We recommend [GRCh38](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/), [T2T-CHM13v2.0](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_009914755.1/), and all currently available pangenomes from the [Human Pangenome Reference Consortium (HPRC)](https://humanpangenome.org). A download script is provided for convenience.
+```bash
+bash scripts/download_references.sh
+```
+
+4. Next, create Minimap2 indexes for the previously downloaded reference genomes. A script is provided for convenience to build minimap2 indexes.
+```bash
+bash scripts/create_minimap2_indexes.sh
+```
+
 3. Prepare your sample.csv file:
 ```
 patient,bam
