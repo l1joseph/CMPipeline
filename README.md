@@ -13,24 +13,35 @@
 
   > You can find these shared files and folder in `/tscc/nfs/home/amabbasi/restricted/microbiome_pipeline/CMPipeline`
 
-3. Next, download the human reference genomes to be used for filtration. We recommend [GRCh38](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/), [T2T-CHM13v2.0](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_009914755.1/), and all currently available pangenomes from the [Human Pangenome Reference Consortium (HPRC)](https://humanpangenome.org). A download script is provided for convenience.
+3. Next, download the human reference genomes to be used for filtration. We recommend [GRCh38](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/), [T2T-CHM13v2.0](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_009914755.1/), and all currently available pangenomes from the [Human Pangenome Reference Consortium (HPRC)](https://humanpangenome.org). A download script is provided for convenience. Please update the reference paths in the main.nf
 ```bash
 bash scripts/download_references.sh
 ```
 
-4. Next, create Minimap2 indexes for the previously downloaded reference genomes. A script is provided for convenience to build minimap2 indexes.
+4. Next, create Minimap2 indexes for the previously downloaded reference genomes. A script is provided for convenience to build minimap2 indexes. Please update the index paths in the main.nf
 ```bash
 bash scripts/create_minimap2_indexes.sh
 ```
 
-3. Prepare your sample.csv file:
+5. Download microbial databases for krakenUniq and Metaphlan4. Please update the database paths in the main.nf once downloaded
+```bash
+# KrakenUniq database
+wget https://genome-idx.s3.amazonaws.com/kraken/uniq/krakendb-2023-08-08-MICROBIAL/kuniq_microbialdb_minus_kdb.20230808.tgz
+wget https://genome-idx.s3.amazonaws.com/kraken/uniq/krakendb-2023-08-08-MICROBIAL/database.kdb
+
+# Metaphlan database
+wget http://cmprod1.cibio.unitn.it/biobakery4/metaphlan_databases/mpa_vJun23_CHOCOPhlAnSGB_202307.tar
+
+```
+
+6. Prepare your sample.csv file (Example format below):
 ```
 patient,bam
 PD56137a,/tscc/nfs/home/amabbasi/restricted/microbiome_pipeline/test_data/PD56137a.unmapped.viral.bam
 PD56137b,/tscc/nfs/home/amabbasi/restricted/microbiome_pipeline/test_data/PD56137b.unmapped.viral.bam
 ```
 
-4. Request an interactive node and run Nextflow in your working directory under an interactive node:
+7. Request an interactive node and run Nextflow in your working directory under an interactive node:
 
 ```
 # Node requesting
@@ -48,4 +59,4 @@ nextflow run main.nf -resume
 # Optionally, you can recieve an notifiction email on completion with -N flag:
 nextflow run main.nf -N your_email@gmail.com
 ```
-5. Every process result and report will be stored in the **RESULT** folder
+8. Every process result and report will be stored in the **RESULT** folder
