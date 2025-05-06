@@ -16,7 +16,29 @@ process mapReads {
     path "${fastq_file.baseName.split('\\.')[0]}.${read_type}.UNMAPPED.FASTP.FILTERED.hg38.t2t.pangenome.fastq.gz", emit: pangenome_fastq
 
     script:
+    // Define the sample name from the input file name
+    def SAMPLE_NAME = fastq_file.baseName.split('\\.')[0]
+
     """
+    out1="${SAMPLE_NAME}.${read_type}.UNMAPPED.FASTP.FILTERED.hg38.fastq.gz"
+    out2="${SAMPLE_NAME}.${read_type}.UNMAPPED.FASTP.FILTERED.hg38.t2t.fastq.gz"
+    out3="${SAMPLE_NAME}.${read_type}.UNMAPPED.FASTP.FILTERED.hg38.t2t.pangenome.fastq.gz"
+
+
+
+    # Skip condition
+    if [[ -f "${params.mapped_reads_dir}/\$out1" && -f "${params.mapped_reads_dir}/\$out2" && -f "${params.mapped_reads_dir}/\$out3" ]]; then
+        echo "Skipping mapReads: Found \$out1, \$out2, \$out3 in publishDir"
+
+        for f in "\$out1" "\$out2" "\$out3"; do
+            if [[ ! -f "\$f" ]]; then
+                ln -s "${params.mapped_reads_dir}/\$f" . 2>/dev/null || cp "${params.mapped_reads_dir}/\$f" .
+            fi
+        done
+        exit 0
+    fi
+    
+    # ========= Actual execution =========
 
     # Run minimap2 on hg38 reference
     minimap2 -2 -ax sr -t 16 ${params.hg38_db} ${fastq_file} -a | samtools fastq -@ 16 -f 4 -F 256 | gzip > ${fastq_file.baseName.split('\\.')[0]}.${read_type}.UNMAPPED.FASTP.FILTERED.hg38.fastq.gz
