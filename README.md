@@ -1,7 +1,7 @@
 # CMPipeline
 
 ## Workflow Introduction
-<img src="https://github.com/ammalabbasi/CMpipeline/blob/main/workflow_logo/v0.2.png" width="95%" height="95%">
+<img src="https://github.com/ammalabbasi/CMpipeline/blob/main/workflow_logo/v0.2.png">
 
 ## How to run EVC pipeline
 1. Install [Nextflow](https://www.nextflow.io/docs/latest/install.html) as a conda environment
