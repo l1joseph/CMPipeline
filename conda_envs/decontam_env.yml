@@ -1,18 +1,21 @@
 # conf/envs/decontam_env.yml
 
-name: nf-decontam-env
-
+name: nf-decontam_env
 channels:
   - conda-forge
   - bioconda
+  - r
   - defaults
-
 dependencies:
   - r-base=4.2
-  - r-pacman
   - r-tidyverse
+  - r-ggplot2
   - r-ggrepel
-  - r-phyloseq
-  - r-decontam
   - r-argparse
+  - r-tools
+  - r-scales
+  - r-pacman
   - r-devtools # phyloseq 설치 시 필요할 수 있음
+  - bioconductor-phyloseq
+  - bioconductor-decontam
+  - bioconductor-biomformat
