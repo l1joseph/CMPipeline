@@ -5,9 +5,14 @@ params.sample = "/tscc/nfs/home/amabbasi/restricted/microbiome_pipeline/sample.c
 params.meta = ""
 
 // Parameteres for preprocessing. Edit this according to analytical purpose
+/// Decontamination
 params.decontam_threshold = 0.1
 params.decontam_min_prevalence = 0.05
 params.decontam_batch_var = "shipment_batch"  // Default batch variable, can be overridden
+/// Batch correction & Normalization
+params.batch_var = "shipment_batch"  // Batch variable for correction
+params.covariates = "age_diag,sex"   // Comma-separated list of covariates
+params.tumor_only = true              // Default: process tumor samples only
 
 // Output directories
 params.unmapped_bam_dir = "${projectDir}/RESULTS/UNMAPPED_BAM"
@@ -19,6 +24,7 @@ params.metaphlan4_dir = "${projectDir}/RESULTS/METAPHLAN4"
 params.humann3_dir = "${projectDir}/RESULTS/HUMANN3"
 params.consensus_taxa_dir = "${projectDir}/RESULTS/CONSENSUS_TAXA"
 params.decontam_dir = "${projectDir}/RESULTS/DECONTAM"
+params.batch_correction_dir = "${projectDir}/RESULTS/BATCH_CORRECTION"
 
 // Databases and ref files [CHANGE THIS]
 params.hg38_db="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/dbs/human-GRC-db.mmi"
@@ -42,6 +48,7 @@ params.humann3_env = "./conda_envs/humann3_env.yml"
 params.krakentools_pack ="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/packages/KrakenTools"
 params.metaphlan4_pack ="/tscc/projects/ps-lalexandrov/shared/CMPipeline_nextflow/packages/MetaPhlAn-4.1.1"
 params.decontam_env = "./conda_envs/decontam_env.yml"
+params.batch_correction_env = "./conda_envs/batch_correction_env.yml"
 
 // Package and script paths
 params.scripts ="${projectDir}/scripts"
@@ -65,6 +72,7 @@ include { metaphlan4 } from './Modules/metaphlan4.nf'
 include { process_metaphlan; process_bracken; consensus_taxa } from './Modules/preprocess_taxa.nf'
 include { humann3 } from './Modules/humann3.nf'
 include { decontamination } from './Modules/decontamination.nf'
+include { batch_correction } from './Modules/batch_correction.nf'
 
 
 // Define the workflow
@@ -204,8 +212,16 @@ workflow {
 
     // ------------------- OPTIONAL STEP5: BATCH CORRECTION ---------------------- //
 
+    // Step 1 : Prepare input for batch correction
+    DECONTAM_RESULTS
+        .map { dataset_type, decontam_table, plots, log -> 
+            tuple(dataset_type, decontam_table)
+        }
+        .combine(metadata_ch)
+        .set { batch_correction_input }
 
-
+    // Step 2 : Run batch correction and normalization
+    batch_correction(batch_correction_input).set { BATCH_CORRECTED_RESULTS }
 
 }
 
