@@ -1,0 +1,19 @@
+name: batch_correction_env
+channels:
+  - conda-forge
+  - bioconda
+  - r
+  - defaults
+dependencies:
+  - r-base=4.3
+  - r-tidyverse
+  - r-vegan
+  - r-argparse
+  - r-devtools
+  - r-doparallel
+  - r-foreach
+  - r-iterators
+  - r-pacman
+  - r-zcompositions
+  - bioconductor-biocmanager
+  # ConQuR might need to be installed via R if not in conda
