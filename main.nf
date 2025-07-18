@@ -6,8 +6,8 @@ params.meta = ""
 
 // Parameteres for preprocessing. Edit this according to analytical purpose
 /// Decontamination
-params.decontam_threshold = 0.1
-params.decontam_min_prevalence = 0.05
+params.decontam_threshold = 0.1      // Threshold for decontam package
+params.decontam_min_prevalence = 0.05    // Minimum prevalence
 params.decontam_batch_var = "shipment_batch"  // Default batch variable, can be overridden
 /// Batch correction & Normalization
 params.batch_var = "shipment_batch"  // Batch variable for correction
