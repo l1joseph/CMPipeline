@@ -782,15 +782,12 @@ remove_contaminants_global <- function(original_otu, final_contaminants_df) {
   
   if (nrow(final_contaminants_df) > 0) {
     cat("\nINFO: Removing", nrow(final_contaminants_df), "contaminants globally from all samples...\n")
-    
-    for (i in 1:nrow(final_contaminants_df)) {
-      contaminant_name <- final_contaminants_df$Contaminant[i]
-      n_batches <- final_contaminants_df$n_batches[i]
-      
-      if (contaminant_name %in% rownames(clean_otu)) {
-        clean_otu[contaminant_name, ] <- 0
-        cat("  - Removed:", contaminant_name, "(found in", n_batches, "batches)\n")
-      }
+
+    to_remove <- final_contaminants_df$Contaminant[final_contaminants_df$Contaminant %in% rownames(clean_otu)]
+    clean_otu[to_remove, ] <- 0
+    for (name in to_remove) {
+      n_batches <- final_contaminants_df$n_batches[final_contaminants_df$Contaminant == name]
+      cat("  - Removed:", name, "(found in", n_batches, "batches)\n")
     }
   } else {
     cat("INFO: No contaminants to remove.\n")
@@ -1360,14 +1357,7 @@ hardcoded_removal_list <- c(
     "PhiX"          # Example: remove Phix spike-in
 )
 
-if(FALSE){
-    force_interactive <- TRUE
-} else {
-    force_interactive <- FALSE
-}
-
-# --- Argument Parsing ---
-# Define and parse command-line arguments
+force_interactive <- FALSE
 
 # --- Argument Parsing ---
 if(interactive() || force_interactive) {

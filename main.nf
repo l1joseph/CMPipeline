@@ -18,8 +18,7 @@ params.start_from = 'beginning'  // Options: 'beginning', 'decontam', 'batch_cor
 // Input files for specific entry points
 params.consensus_otu_table = null  // For starting from decontam
 params.decontam_otu_table = null   // For starting from batch_correction
-// params.metadata_file = "${projectDir}/NIH_TEST/test_metadata.csv"  // Required for decontam/batch_correction
-params.metadata_file = "/tscc/lustre/restricted/alexandrov-ddn/users/amabbasi/laura/data/EAC_GEJ_METADATA.txt"
+params.metadata_file = null  // Required for decontam/batch_correction: --metadata_file <path>
 // ============================================================================
 // DECONTAMINATION PARAMETERS
 // ============================================================================
@@ -37,10 +36,7 @@ params.control_values = "Normal"
 // BATCH CORRECTION PARAMETERS
 // ============================================================================
 
-
-
 params.batch_corr_covariates = "age_diag,sex,bmi"  // Start conservative
-params.tumor_value = "Tumor"
 params.tumor_only = false  // have matched tumor/normal, keep both
 params.phase = "auto"
 params.r2_threshold = 0.25
@@ -49,8 +45,7 @@ params.r2_threshold = 0.25
 // INPUT/OUTPUT PATHS
 // ============================================================================
 
-// Edit this with your sample.csv path
-params.sample = "/tscc/lustre/restricted/alexandrov-ddn/users/l1joseph/CMPipeline_updated/CMPipeline_github_251124_update_kjy/samples.csv"
+params.sample = "${projectDir}/samples.csv"
 
 // Output directories
 params.unmapped_bam_dir = "${projectDir}/RESULTS/UNMAPPED_BAM"
@@ -119,7 +114,7 @@ include { FASTQC as FASTQCHG38 } from './Modules/fastqc.nf'
 include { FASTQC as FASTQCT2T } from './Modules/fastqc.nf'
 include { FASTQC as FASTQCPANGENOME } from './Modules/fastqc.nf'
 include { filterReads } from './Modules/filter_reads.nf'
-include { mapReads as mapReads } from './Modules/map_reads.nf'
+include { mapReads } from './Modules/map_reads.nf'
 // Taxonomic classification modules
 include { Bracken } from './Modules/Bracken.nf'
 include { metaphlan4 } from './Modules/metaphlan4.nf'
@@ -239,28 +234,17 @@ workflow {
                 humann3(MAPPED_READS_MULTI.PAN).set { HUMANN3_OUT }
 
                 // Collect per-sample outputs for merging
-                HUMANN3_OUT.map { genefamilies, pathabundance, pathcoverage ->
-                    genefamilies
-                }
-                .flatten()
-                .collect()
-                .set { humann3_genefamilies }
+                HUMANN3_OUT.multiMap { genefamilies, pathabundance, pathcoverage ->
+                    genefamilies: genefamilies
+                    pathabundance: pathabundance
+                    pathcoverage: pathcoverage
+                }.set { HUMANN3_MULTI }
 
-                HUMANN3_OUT.map { genefamilies, pathabundance, pathcoverage ->
-                    pathabundance
-                }
-                .flatten()
-                .collect()
-                .set { humann3_pathabundance }
-
-                HUMANN3_OUT.map { genefamilies, pathabundance, pathcoverage ->
-                    pathcoverage
-                }
-                .flatten()
-                .collect()
-                .set { humann3_pathcoverage }
-
-                merge_humann3(humann3_genefamilies, humann3_pathabundance, humann3_pathcoverage)
+                merge_humann3(
+                    HUMANN3_MULTI.genefamilies.flatten().collect(),
+                    HUMANN3_MULTI.pathabundance.flatten().collect(),
+                    HUMANN3_MULTI.pathcoverage.flatten().collect()
+                )
             }
         } else {
             log.info "Skipping taxonomic classification step"
@@ -312,15 +296,11 @@ workflow {
                 file(params.metadata_file)
             )).set { ch_for_decontam }
         } else if (params.start_from == 'beginning' && !params.skip_consensus) {
-            // Wait for consensus_taxa to complete, then create channel from file
             if (!params.metadata_file) {
                 error "ERROR: When using --run_decontam, you must provide:\n" +
                       "  --metadata_file <path>"
             }
-            // Extract the genus file from consensus output (second output)
-            Channel.empty()
-                .mix(CONSENSUS_OUTPUT)
-                .take(1)
+            CONSENSUS_OUTPUT
                 .map {
                     tuple('consensus_run',
                           file("${params.consensus_taxa_dir}/bracken.metaphlan.common.genus.mpa.report.txt"),
@@ -328,13 +308,11 @@ workflow {
                 }
                 .set { ch_for_decontam }
         } else if (params.start_from == 'beginning' && params.skip_consensus) {
-            // Skip consensus taxa, use Bracken genus output directly
             if (!params.metadata_file) {
                 error "ERROR: When using --run_decontam with --skip_consensus, you must provide:\n" +
                       "  --metadata_file <path>"
             }
             log.info "Skipping consensus taxa - using Bracken genus output directly for decontamination"
-            // Wait for BRACKEN_FILES to be ready, then use the genus file
             BRACKEN_FILES
                 .map { bracken_genus_file, bracken_species_file ->
                     tuple('bracken_run', bracken_genus_file, file(params.metadata_file))
@@ -374,9 +352,7 @@ workflow {
                 error "ERROR: When using --run_batch_correction without decontam, you must provide:\n" +
                       "  --metadata_file <path>"
             }
-            Channel.empty()
-                .mix(CONSENSUS_OUTPUT)
-                .take(1)
+            CONSENSUS_OUTPUT
                 .map {
                     tuple('consensus_run',
                           file("${params.consensus_taxa_dir}/bracken.metaphlan.common.genus.mpa.report.txt"),
@@ -384,13 +360,11 @@ workflow {
                 }
                 .set { ch_batch_input }
         } else if (params.start_from == 'beginning' && params.skip_consensus) {
-            // Skip consensus taxa, use Bracken genus output directly
             if (!params.metadata_file) {
                 error "ERROR: When using --run_batch_correction with --skip_consensus, you must provide:\n" +
                       "  --metadata_file <path>"
             }
             log.info "Skipping consensus taxa - using Bracken genus output directly for batch correction"
-            // Wait for BRACKEN_FILES to be ready, then use the genus file
             BRACKEN_FILES
                 .map { bracken_genus_file, bracken_species_file ->
                     tuple('bracken_run', bracken_genus_file, file(params.metadata_file))

@@ -38,7 +38,7 @@ process antiSMASH {
     if [[ -f "${params.antismash_dir}/${sample_id}/index.html" ]]; then
         echo "Skipping ${sample_id}: results already exist"
         mkdir -p ${sample_id}
-        cp -rL ${params.antismash_dir}/${sample_id}/* ${sample_id}/ 2>/dev/null || true
+        ln -s ${params.antismash_dir}/${sample_id}/* ${sample_id}/ 2>/dev/null || true
         exit 0
     fi
 
