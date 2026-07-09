@@ -1,18 +1,4 @@
 #!/bin/bash
-#SBATCH -p platinum
-#SBATCH -q hcp-ddp302
-#SBATCH -A ddp302
-#SBATCH --job-name=repair_large
-#SBATCH --output=scripts/batch_scripts/log/repair_large_%A_%a.out
-#SBATCH --error=scripts/batch_scripts/log/repair_large_%A_%a.err
-#SBATCH --time=04:00:00
-#SBATCH --mem=128G
-#SBATCH -N 1
-#SBATCH -n 1
-#SBATCH -c 2
-#SBATCH --array=1-3
-#SBATCH --mail-user=l1joseph@ucsd.edu
-#SBATCH --mail-type=END,FAIL
 
 # Re-pair the 3 high-read-count samples that OOM'd with 16GB
 

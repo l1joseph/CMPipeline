@@ -1,17 +1,4 @@
 #!/bin/bash
-#SBATCH -N 1
-#SBATCH -n 1
-#SBATCH -c 32
-#SBATCH --mem=200G
-#SBATCH -t 1200
-#SBATCH -p platinum
-#SBATCH -q hcp-ddp302
-#SBATCH -A ddp302
-#SBATCH --mail-user=l1joseph@ucsd.edu
-#SBATCH --mail-type=END,FAIL
-#SBATCH --job-name=CMP_metaphlan_index
-#SBATCH --output=/tscc/lustre/restricted/alexandrov-ddn/users/l1joseph/CMPipeline/scripts/batch_scripts/log/CMP_metaphlan_index_%j.out
-#SBATCH --error=/tscc/lustre/restricted/alexandrov-ddn/users/l1joseph/CMPipeline/scripts/batch_scripts/log/CMP_metaphlan_index_%j.err
 
 # Load Conda
 source ~/.bashrc

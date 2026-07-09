@@ -1,17 +1,4 @@
 #!/bin/bash
-#SBATCH -p platinum
-#SBATCH -q hcp-ddp302
-#SBATCH -A ddp302
-#SBATCH --job-name=dl_gtdb_checkm2
-#SBATCH --output=scripts/batch_scripts/log/dl_gtdb_checkm2_%j.out
-#SBATCH --error=scripts/batch_scripts/log/dl_gtdb_checkm2_%j.err
-#SBATCH --time=24:00:00
-#SBATCH --mem=64G
-#SBATCH -N 1
-#SBATCH -n 1
-#SBATCH -c 8
-#SBATCH --mail-user=l1joseph@ucsd.edu
-#SBATCH --mail-type=END,FAIL
 
 # ============================================================================
 # Download GTDB-Tk and CheckM2 databases for nf-core/mag
