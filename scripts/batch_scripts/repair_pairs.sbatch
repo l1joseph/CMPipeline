@@ -1,18 +1,4 @@
 #!/bin/bash
-#SBATCH -p platinum
-#SBATCH -q hcp-ddp302
-#SBATCH -A ddp302
-#SBATCH --job-name=repair_pairs
-#SBATCH --output=scripts/batch_scripts/log/repair_pairs_%A_%a.out
-#SBATCH --error=scripts/batch_scripts/log/repair_pairs_%A_%a.err
-#SBATCH --time=02:00:00
-#SBATCH --mem=16G
-#SBATCH -N 1
-#SBATCH -n 1
-#SBATCH -c 2
-#SBATCH --array=1-520%50
-#SBATCH --mail-user=l1joseph@ucsd.edu
-#SBATCH --mail-type=END,FAIL
 
 # Re-pair R1/R2 FASTQ files for nf-core/mag input.
 # Our host depletion processes R1 and R2 independently, causing pair mismatch.

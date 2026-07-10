@@ -1,17 +1,4 @@
 #!/bin/bash
-#SBATCH -p platinum
-#SBATCH -q hcp-ddp302
-#SBATCH -A ddp302
-#SBATCH --job-name=antismash
-#SBATCH --output=scripts/batch_scripts/log/antismash_%j.out
-#SBATCH --error=scripts/batch_scripts/log/antismash_%j.err
-#SBATCH --time=72:00:00
-#SBATCH --mem=32G
-#SBATCH -N 1
-#SBATCH -n 1
-#SBATCH -c 4
-#SBATCH --mail-user=l1joseph@ucsd.edu
-#SBATCH --mail-type=END,FAIL
 
 # ============================================================================
 # Run antiSMASH on MEGAHIT assembly contigs or MAG bins

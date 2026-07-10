@@ -8,7 +8,6 @@
 #  - PERMANOVA-based stopping criteria (25% R² reduction)
 #  - Automatic phase selection based on results
 
-# Rscript /tscc/lustre/restricted/alexandrov-ddn/users/kohjy2000/IAG_microbiome/03.Scripts/250820_RCC_TCGA/02.Preprocessing/2500703_batch_correction_normalization.r --otu "/tscc/lustre/restricted/alexandrov-ddn/users/kohjy2000/IAG_microbiome/02.Results/250924_TCGA_RCC_preprocessing_posthoc/251006_2p_3read_filtered_strict/decontam_result.decontam_pkg_decontaminated.csv" --meta "/tscc/lustre/restricted/alexandrov-ddn/users/kohjy2000/IAG_microbiome/02.Results/250924_TCGA_RCC_preprocessing_posthoc/Metadata/integrated_rcc_metadata_patient_based_251006.tsv" --prefix "/tscc/lustre/restricted/alexandrov-ddn/users/kohjy2000/IAG_microbiome/02.Results/250924_TCGA_RCC_preprocessing_posthoc/251006_2p_3read_filtered_strict/251013_tumor_only_" --tumor_only
 
 
 

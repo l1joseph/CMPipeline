@@ -35,9 +35,8 @@ process humann3 {
         exit 0
     fi
 
-    # Concatenate R1 and R2 fastq files
-    cat ${r1_fastq} ${r2_fastq} > ${SAMPLE_NAME}_combined.fastq.gz
-    gunzip ${SAMPLE_NAME}_combined.fastq.gz
+    # Concatenate and decompress R1 and R2 fastq files in one pass
+    zcat ${r1_fastq} ${r2_fastq} > ${SAMPLE_NAME}_combined.fastq
 
     # Check for existing MetaPhlAn profile (avoids redundant MetaPhlAn run)
     TAXONOMIC_PROFILE_OPT=""

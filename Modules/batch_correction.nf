@@ -37,7 +37,7 @@ process BatchCorrection {
         --batch_column ${params.batch_column} \\
         --covariates ${params.batch_corr_covariates} \\
         --type_column ${params.type_column} \\
-        --tumor_value ${params.tumor_value} \\
+        --tumor_value ${params.tumor_values} \\
         ${tumor_only_flag} \\
         --phase ${params.phase} \\
         --r2_threshold ${params.r2_threshold} \\
